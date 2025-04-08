@@ -8,6 +8,7 @@ import type { MigrationAction } from '../types';
 
 export interface PostDeployJobData {
   readonly type: 'reindex' | 'custom' | 'dynamic';
+  readonly shardName: string;
   readonly asyncJobId: string;
   readonly requestId?: string;
   readonly traceId?: string;

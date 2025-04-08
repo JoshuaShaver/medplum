@@ -1,7 +1,8 @@
 // SPDX-FileCopyrightText: Copyright Orangebot, Inc. and Medplum contributors
 // SPDX-License-Identifier: Apache-2.0
 import { concatUrls } from '@medplum/core';
-import type { MedplumServerConfig } from './types';
+import { getConfig } from './loader';
+import type { MedplumServerConfig, MedplumShardConfig } from './types';
 
 const DEFAULT_AWS_REGION = 'us-east-1';
 
@@ -46,6 +47,16 @@ export function addDefaults(config: MedplumServerConfig): ServerConfig {
   config.defaultAuthRateLimit ??= 160;
 
   config.defaultFhirQuota ??= 50_000;
+  config.shards = config.shards ?? {};
+  config.shards.global = {
+    name: 'global',
+    database: config.database,
+    redis: config.redis,
+  };
+  for (const [shardName, shardConfig] of Object.entries(config.shards)) {
+    shardConfig.name = shardName;
+  }
+
   return config as ServerConfig;
 }
 
@@ -144,4 +155,9 @@ const objectKeys = new Set(['tls', 'ssl', 'defaultProjectSystemSetting', 'defaul
 
 export function isObjectConfig(key: string): boolean {
   return objectKeys.has(key);
+}
+
+export function getShardConfig(shardName: string): MedplumShardConfig | undefined {
+  const config = getConfig();
+  return config.shards[shardName];
 }
