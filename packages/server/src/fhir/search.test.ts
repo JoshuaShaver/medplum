@@ -77,6 +77,7 @@ describe('project-scoped Repository', () => {
       projects: [project],
       currentProject: project,
       author: { reference: 'User/' + randomUUID() },
+      shardName: 'TODO',
     });
   });
 

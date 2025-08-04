@@ -29,6 +29,7 @@ describe('Cron Worker', () => {
       extendedMode: true,
       projects: [botProjectDetails.project],
       author: createReference(botProjectDetails.client),
+      shardName: 'TODO',
     });
   });
 
@@ -179,6 +180,7 @@ describe('Cron Worker', () => {
         author: {
           reference: 'ClientApplication/' + randomUUID(),
         },
+        shardName: 'TODO',
       });
 
       const bot = await repo.createResource<Bot>({

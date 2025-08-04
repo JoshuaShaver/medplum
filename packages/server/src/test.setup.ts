@@ -154,6 +154,7 @@ export async function createTestProject<T extends StrictTestProjectOptions<T> = 
           strictMode: project.strictMode,
           extendedMode: true,
           checkReferencesOnWrite: project.checkReferencesOnWrite,
+          shardName: 'TODO',
         };
 
         if (typeof options.withRepo === 'object') {

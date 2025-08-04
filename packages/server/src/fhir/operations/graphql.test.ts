@@ -43,6 +43,7 @@ describe('GraphQL', () => {
       const aliceRepo = new Repository({
         author: createReference(aliceRegistration.profile),
         projects: [aliceRegistration.project],
+        shardName: 'TODO',
       });
 
       // Create a profile picture

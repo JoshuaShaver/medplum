@@ -270,6 +270,7 @@ describe('URL rewrite', () => {
         resourceType: 'AccessPolicy',
         resource: [{ resourceType: 'Binary' }, { resourceType: 'Patient' }],
       },
+      shardName: 'TODO',
     });
     const result1 = await rewriteAttachments(RewriteMode.PRESIGNED_URL, repo1, media);
     expect(result1.content?.url).not.toBe(`Binary/${binaryWithSecurityContext.id}`);
@@ -283,6 +284,7 @@ describe('URL rewrite', () => {
         resourceType: 'AccessPolicy',
         resource: [{ resourceType: 'Binary' }],
       },
+      shardName: 'TODO',
     });
     const result2 = await rewriteAttachments(RewriteMode.PRESIGNED_URL, repo2, media);
     expect(result2.content?.url).toBe(`Binary/${binaryWithSecurityContext.id}`);
@@ -296,6 +298,7 @@ describe('URL rewrite', () => {
         resourceType: 'AccessPolicy',
         resource: [{ resourceType: 'Binary' }, { resourceType: 'Patient', criteria: `Patient?_id=${patient.id}` }],
       },
+      shardName: 'TODO',
     });
     const result3 = await rewriteAttachments(RewriteMode.PRESIGNED_URL, repo3, media);
     expect(result3.content?.url).not.toBe(`Binary/${binaryWithSecurityContext.id}`);
@@ -309,6 +312,7 @@ describe('URL rewrite', () => {
         resourceType: 'AccessPolicy',
         resource: [{ resourceType: 'Binary' }, { resourceType: 'Patient', criteria: `Patient?_id=${randomUUID()}` }],
       },
+      shardName: 'TODO',
     });
     const result4 = await rewriteAttachments(RewriteMode.PRESIGNED_URL, repo4, media);
     expect(result4.content?.url).toBe(`Binary/${binaryWithSecurityContext.id}`);

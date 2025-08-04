@@ -741,11 +741,13 @@ describe('Non-strict mode', () => {
       strictMode: false,
       projects: [project],
       author: { reference: 'User/' + randomUUID() },
+      shardName: 'TODO',
     });
     repo = new Repository({
       strictMode: true,
       projects: [project],
       author: { reference: 'User/' + randomUUID() },
+      shardName: 'TODO',
     });
     patient = await nonStrictRepo.createResource<Patient>({
       resourceType: 'Patient',
@@ -846,6 +848,7 @@ describe('Condition.code token queries', () => {
       strictMode: true,
       projects: [project],
       author: { reference: 'User/' + randomUUID() },
+      shardName: 'TODO',
     });
 
     patient = await repo.createResource<Patient>({ resourceType: 'Patient', name: [{ given: ['Henry'] }] });
@@ -1270,6 +1273,7 @@ describe('MedicationRequest.code legacy behavior', () => {
       strictMode: true,
       projects: [project],
       author: { reference: 'User/' + randomUUID() },
+      shardName: 'TODO',
     });
 
     patient = await repo.createResource<Patient>({ resourceType: 'Patient', name: [{ given: ['Henry'] }] });

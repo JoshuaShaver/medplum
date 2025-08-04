@@ -33,6 +33,7 @@ describe('Job status', () => {
       new Repository({
         projects: [testProject.project],
         author: { reference: 'User/' + randomUUID() },
+        shardName: 'TODO',
       })
     );
   });

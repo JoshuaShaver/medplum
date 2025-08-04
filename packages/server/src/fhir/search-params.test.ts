@@ -24,6 +24,7 @@ describe('Medplum Custom Search Parameters', () => {
       strictMode: true,
       projects: [project],
       author: { reference: 'User/' + randomUUID() },
+      shardName: 'TODO',
     });
   });
 

@@ -39,7 +39,17 @@ import { registerNew } from '../auth/register';
 import { loadTestConfig } from '../config/loader';
 import { addTestUser, createTestProject, withTestContext } from '../test.setup';
 import { buildAccessPolicy, getRepoForLogin } from './accesspolicy';
-import { getSystemRepo, Repository } from './repo';
+import { getSystemRepo, Repository, RepositoryContext } from './repo';
+
+function getRepository(partialContext: Partial<RepositoryContext>): Repository {
+  return new Repository({
+    author: {
+      reference: 'Practitioner/123',
+    },
+    shardName: 'TODO',
+    ...partialContext,
+  });
+}
 
 describe('AccessPolicy', () => {
   let testProject: WithId<Project>;
@@ -73,12 +83,7 @@ describe('AccessPolicy', () => {
         resourceType: 'AccessPolicy',
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       await expect(repo2.readResource('Patient', patient.id)).rejects.toThrow('Forbidden');
     }));
@@ -90,12 +95,7 @@ describe('AccessPolicy', () => {
         resourceType: 'AccessPolicy',
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       await expect(repo2.search({ resourceType: 'Patient' })).rejects.toThrow('Forbidden');
     }));
@@ -119,12 +119,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       await expect(repo2.readResource('Patient', patient.id)).resolves.toBeDefined();
       await expect(repo2.updateResource(patient)).rejects.toThrow('Forbidden');
@@ -156,12 +151,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       await expect(repo2.readResource('ServiceRequest', resource.id)).resolves.toBeDefined();
       await expect(repo2.updateResource(resource)).rejects.toThrow('Forbidden');
@@ -193,12 +183,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       await expect(repo2.readResource('ServiceRequest', resource.id)).resolves.toBeDefined();
       await expect(repo2.updateResource({ ...resource, status: 'completed' })).rejects.toThrow('Forbidden');
@@ -223,12 +208,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       await expect(repo2.readResource('Patient', patient.id)).resolves.toBeDefined();
       await expect(repo2.deleteResource('Patient', patient.id)).rejects.toThrow('Forbidden');
@@ -253,13 +233,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        extendedMode: true,
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo = getRepository({ accessPolicy });
 
       const patient = await repo.createResource<Patient>({
         resourceType: 'Patient',
@@ -300,13 +274,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        extendedMode: true,
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo = getRepository({ accessPolicy });
 
       const patient = await repo.createResource<Patient>({
         resourceType: 'Patient',
@@ -353,13 +321,7 @@ describe('AccessPolicy', () => {
           binaryResource.criteria = 'Binary?_compartment=' + orgRef;
         }
 
-        const repo = new Repository({
-          extendedMode: true,
-          accessPolicy,
-          author: {
-            reference: 'Practitioner/1',
-          },
-        });
+        const repo = getRepository({ accessPolicy });
 
         const binary = await repo.createResource<Binary>({
           resourceType: 'Binary',
@@ -405,13 +367,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        extendedMode: true,
-        accessPolicy,
-        author: {
-          reference: 'Practitioner/1',
-        },
-      });
+      const repo = getRepository({ extendedMode: true, accessPolicy });
 
       const observation = await repo.createResource<Observation>({
         resourceType: 'Observation',
@@ -432,13 +388,8 @@ describe('AccessPolicy', () => {
       expect(readObservation.meta?.compartment).toContainEqual({ reference: 'Organization/' + overrideId });
       expect(readObservation.meta?.compartment).toHaveLength(1);
 
-      const adminRepo = new Repository({
-        extendedMode: true,
-        projectAdmin: true,
-        author: {
-          reference: 'Practitioner/0',
-        },
-      });
+      const adminRepo = getRepository({ extendedMode: true, projectAdmin: true });
+
       const orgReference = { reference: 'Organization/' + randomUUID() };
       const patient = await adminRepo.createResource<Patient>({
         resourceType: 'Patient',
@@ -504,21 +455,8 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo1 = new Repository({
-        extendedMode: true,
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy: accessPolicy1,
-      });
-
-      const repo2 = new Repository({
-        extendedMode: true,
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy: accessPolicy2,
-      });
+      const repo1 = getRepository({ extendedMode: true, accessPolicy: accessPolicy1 });
+      const repo2 = getRepository({ extendedMode: true, accessPolicy: accessPolicy2 });
 
       const patient1 = await repo1.createResource<Patient>({
         resourceType: 'Patient',
@@ -583,7 +521,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo1 = new Repository({
+      const repo1 = getRepository({
         extendedMode: true,
         author: {
           reference: 'Practitioner/123',
@@ -591,7 +529,7 @@ describe('AccessPolicy', () => {
         accessPolicy: accessPolicy1,
       });
 
-      const repo2 = new Repository({
+      const repo2 = getRepository({
         extendedMode: true,
         author: {
           reference: 'Practitioner/456',
@@ -644,21 +582,8 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo1 = new Repository({
-        extendedMode: true,
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy: accessPolicy1,
-      });
-
-      const repo2 = new Repository({
-        extendedMode: true,
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy: accessPolicy2,
-      });
+      const repo1 = getRepository({ extendedMode: true, accessPolicy: accessPolicy1 });
+      const repo2 = getRepository({ extendedMode: true, accessPolicy: accessPolicy2 });
 
       const patient1 = await repo1.createResource<Patient>({
         resourceType: 'Patient',
@@ -942,12 +867,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       const readResource = await repo2.readResource<Patient>('Patient', patient.id);
       expect(readResource).toMatchObject({
@@ -987,12 +907,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       const readResource = await repo2.readResource<Patient>('Patient', patient.id);
       expect(readResource).toMatchObject({
@@ -1030,12 +945,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo = getRepository({ accessPolicy });
 
       // Create a patient with an identifier
       const patient = await repo.createResource<Patient>({
@@ -1058,12 +968,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo = getRepository({ accessPolicy });
 
       const patient = await repo.createResource<Patient>({
         resourceType: 'Patient',
@@ -1098,12 +1003,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo = getRepository({ accessPolicy });
 
       // Try to add an identifier
       // This returns success, but the result should not have an identifier
@@ -1164,12 +1064,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo = getRepository({ accessPolicy });
 
       const { identifier, ...rest } = patient1;
       expect(identifier).toBeDefined();
@@ -1217,10 +1112,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        author: { reference: 'Practitioner/123' },
-        accessPolicy,
-      });
+      const repo = getRepository({ accessPolicy });
 
       const { multipleBirthInteger, ...rest } = patient1;
       expect(multipleBirthInteger).toStrictEqual(2);
@@ -1351,10 +1243,7 @@ describe('AccessPolicy', () => {
         resource: [{ resourceType: 'Patient', hiddenFields: ['name.family'] }],
       };
 
-      const repo2 = new Repository({
-        author: { reference: 'Practitioner/123' },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       const readResource = await repo2.readResource<Patient>('Patient', patient.id);
       expect(readResource).toMatchObject({
@@ -1399,7 +1288,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({ author: { reference: 'Practitioner/123' }, accessPolicy });
+      const repo2 = getRepository({ accessPolicy });
 
       const readResource1 = await repo2.readResource<Observation>('Observation', obs1.id);
       expect(readResource1).toMatchObject({
@@ -1517,7 +1406,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({ author: { reference: 'Practitioner/123' }, accessPolicy });
+      const repo2 = getRepository({ accessPolicy });
 
       const readResource1 = await repo2.readResource<Observation>('Observation', obsQuantity.id);
       expect(readResource1).toMatchObject({
@@ -1591,12 +1480,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo = getRepository({ accessPolicy });
 
       // Create test resource
       const obs: Observation = {
@@ -1641,12 +1525,7 @@ describe('AccessPolicy', () => {
         ],
       };
 
-      const repo2 = new Repository({
-        author: {
-          reference: 'Practitioner/123',
-        },
-        accessPolicy,
-      });
+      const repo2 = getRepository({ accessPolicy });
 
       // Can create in "active" status
       let sr = await repo2.createResource<ServiceRequest>({
@@ -1672,8 +1551,7 @@ describe('AccessPolicy', () => {
 
   test('Compound parameterized access policy', () =>
     withTestContext(async () => {
-      const adminRepo = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const adminRepo = getRepository({
         projects: [testProject],
         strictMode: true,
         extendedMode: true,
@@ -1727,8 +1605,7 @@ describe('AccessPolicy', () => {
 
   test('String parameters', () =>
     withTestContext(async () => {
-      const adminRepo = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const adminRepo = getRepository({
         projects: [testProject],
         strictMode: true,
         extendedMode: true,
@@ -1776,8 +1653,7 @@ describe('AccessPolicy', () => {
     withTestContext(async () => {
       const project = await systemRepo.createResource<Project>({ resourceType: 'Project', name: 'Test Project' });
 
-      const adminRepo = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const adminRepo = getRepository({
         projects: [project],
         strictMode: true,
         extendedMode: true,
@@ -2219,8 +2095,7 @@ describe('AccessPolicy', () => {
     withTestContext(async () => {
       const { project, membership } = await createTestProject({ superAdmin: true, withClient: true });
 
-      const adminRepo = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const adminRepo = getRepository({
         projects: [project],
         strictMode: true,
         extendedMode: true,
@@ -2320,8 +2195,7 @@ describe('AccessPolicy', () => {
           },
         ],
       });
-      const repo = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const repo = getRepository({
         projects: [project],
         projectAdmin: true,
         strictMode: true,
@@ -2386,8 +2260,7 @@ describe('AccessPolicy', () => {
   test('Project admin check references', () =>
     withTestContext(async () => {
       const project1 = await systemRepo.createResource<Project>({ resourceType: 'Project', name: 'Test1' });
-      const repo1 = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const repo1 = getRepository({
         projects: [project1],
         projectAdmin: true,
         strictMode: true,
@@ -2396,8 +2269,7 @@ describe('AccessPolicy', () => {
       });
 
       const project2 = await systemRepo.createResource<Project>({ resourceType: 'Project', name: 'Test2' });
-      const repo2 = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const repo2 = getRepository({
         projects: [project2],
         projectAdmin: true,
         strictMode: true,
@@ -2458,8 +2330,7 @@ describe('AccessPolicy', () => {
 
   test('Shared project read only', () =>
     withTestContext(async () => {
-      const repo = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const repo = getRepository({
         projects: [testProject],
         projectAdmin: true,
         strictMode: true,
@@ -2483,8 +2354,7 @@ describe('AccessPolicy', () => {
       };
 
       const project1 = await systemRepo.createResource<Project>({ resourceType: 'Project', name: 'Test1' });
-      const repo1 = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const repo1 = getRepository({
         projects: [project1],
         projectAdmin: true,
         strictMode: true,
@@ -2493,8 +2363,7 @@ describe('AccessPolicy', () => {
       });
 
       const project2 = await systemRepo.createResource<Project>({ resourceType: 'Project', name: 'Test2' });
-      const repo2 = new Repository({
-        author: { reference: 'Practitioner/' + randomUUID() },
+      const repo2 = getRepository({
         projects: [project2, project1],
         projectAdmin: true,
         strictMode: true,
@@ -2580,7 +2449,7 @@ describe('AccessPolicy', () => {
 
       // Repos for the test user
 
-      const repoWithoutAccessPolicy = new Repository({
+      const repoWithoutAccessPolicy = getRepository({
         author: createReference(profile),
         projects: [project],
         projectAdmin: false,
@@ -2588,7 +2457,7 @@ describe('AccessPolicy', () => {
         extendedMode: true,
       });
 
-      const repoWithAccessPolicy = new Repository({
+      const repoWithAccessPolicy = getRepository({
         author: createReference(profile),
         projects: [project],
         projectAdmin: false,

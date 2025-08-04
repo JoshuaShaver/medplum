@@ -865,6 +865,7 @@ describe('Subscription Heartbeat', () => {
       author: {
         reference: 'ClientApplication/' + randomUUID(),
       },
+      shardName: 'TODO',
     });
 
     await new Promise<void>((resolve) => {

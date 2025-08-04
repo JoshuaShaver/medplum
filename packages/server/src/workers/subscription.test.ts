@@ -76,7 +76,12 @@ describe('Subscription Worker', () => {
     );
 
     repo = _repo;
-    superAdminRepo = new Repository({ extendedMode: true, superAdmin: true, author: createReference(client) });
+    superAdminRepo = new Repository({
+      extendedMode: true,
+      superAdmin: true,
+      author: createReference(client),
+      shardName: 'TODO',
+    });
 
     // Create another project, this one with bots enabled
     const botProjectDetails = await createTestProject({ withClient: true });
@@ -85,6 +90,7 @@ describe('Subscription Worker', () => {
       projects: [botProjectDetails.project],
       author: createReference(botProjectDetails.client),
       currentProject: botProjectDetails.project,
+      shardName: 'TODO',
     });
 
     mockLambdaClient = mockClient(LambdaClient);

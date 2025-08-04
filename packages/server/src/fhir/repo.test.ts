@@ -75,6 +75,7 @@ describe('FHIR Repo', () => {
       author: {
         reference: 'Practitioner/' + randomUUID(),
       },
+      shardName: 'TODO',
     });
   });
 
@@ -392,6 +393,7 @@ describe('FHIR Repo', () => {
         author: {
           reference: author,
         },
+        shardName: 'TODO',
       });
 
       const patient = await repo.createResource<Patient>({
@@ -412,6 +414,7 @@ describe('FHIR Repo', () => {
         author: {
           reference: author,
         },
+        shardName: 'TODO',
       });
 
       // We are acting as a Practitioner
@@ -461,6 +464,7 @@ describe('FHIR Repo', () => {
         author: {
           reference: author,
         },
+        shardName: 'TODO',
       });
 
       await repo.createResource<ResearchDefinition>({

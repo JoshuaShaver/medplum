@@ -307,7 +307,10 @@ superAdminRouter.post(
     }
 
     const { baseUrl } = getConfig();
-    const dataMigrationJob = await maybeStartPostDeployMigration(req?.body?.dataVersion as number | undefined);
+    const dataMigrationJob = await maybeStartPostDeployMigration(
+      'shardNameTODO',
+      req?.body?.dataVersion as number | undefined
+    );
     // If there is no migration job to run, return allOk
     if (!dataMigrationJob) {
       sendOutcome(res, allOk);
@@ -339,8 +342,8 @@ superAdminRouter.post(
     const exec = new AsyncJobExecutor(ctx.repo);
     await exec.init(req.originalUrl);
     await exec.run(async (asyncJob) => {
-      const jobData = prepareDynamicMigrationJobData(asyncJob, migrationActions);
-      await addPostDeployMigrationJobData(jobData);
+      const jobData = prepareDynamicMigrationJobData(asyncJob, 'shardNameTODO', migrationActions);
+      await addPostDeployMigrationJobData(ctx.repo, jobData);
     });
 
     const { baseUrl } = getConfig();
