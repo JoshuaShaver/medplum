@@ -91,7 +91,7 @@ export class AuthenticatedRequestContext extends RequestContext {
 
   private __systemRepo?: SystemRepository;
   get systemRepo(): SystemRepository {
-    this.__systemRepo ??= getShardSystemRepo(this.authState.projectShardId);
+    this.__systemRepo ??= getShardSystemRepo(this.repo.shardId);
     return this.__systemRepo;
   }
 
@@ -120,11 +120,12 @@ export class AuthenticatedRequestContext extends RequestContext {
   }
 
   static system(ctx?: { requestId?: string; traceId?: string; shardId?: string }): AuthenticatedRequestContext {
+    const projectShardId = ctx?.shardId ?? GLOBAL_SHARD_ID;
     return new AuthenticatedRequestContext(
       ctx?.requestId ?? '',
       ctx?.traceId ?? '',
-      { userConfig: {} } as unknown as AuthState,
-      getShardSystemRepo(ctx?.shardId ?? GLOBAL_SHARD_ID),
+      { userConfig: {}, projectShardId } as unknown as AuthState,
+      getShardSystemRepo(projectShardId),
       { logger: systemLogger }
     );
   }
