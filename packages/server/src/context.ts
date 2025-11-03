@@ -25,7 +25,6 @@ import { authenticateTokenImpl, isExtendedMode } from './oauth/middleware';
 import { getRedis } from './redis';
 import type { IRequestContext } from './request-context-store';
 import { requestContextStore } from './request-context-store';
-import { GLOBAL_SHARD_ID } from './sharding/sharding-utils';
 import { parseTraceparent } from './traceparent';
 
 export class RequestContext implements IRequestContext {
@@ -120,7 +119,7 @@ export class AuthenticatedRequestContext extends RequestContext {
   }
 
   static system(ctx?: { requestId?: string; traceId?: string; shardId?: string }): AuthenticatedRequestContext {
-    const projectShardId = ctx?.shardId ?? GLOBAL_SHARD_ID;
+    const projectShardId = ctx?.shardId ?? 'TODOAuthenticatedRequestContext.system() default';
     return new AuthenticatedRequestContext(
       ctx?.requestId ?? '',
       ctx?.traceId ?? '',
