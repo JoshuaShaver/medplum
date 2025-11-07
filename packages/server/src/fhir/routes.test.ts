@@ -385,7 +385,6 @@ describe('FHIR Routes', () => {
       readFileSync(resolve(__dirname, '__test__/us-core-patient.json'), 'utf8')
     ) as StructureDefinition;
 
-    
     // Modify the US Core Patient profile to have 'required' binding for communication.language
     const commLang = usCorePatientProfile.snapshot?.element.find(
       (elem) => elem.id === 'Patient.communication.language'
@@ -404,7 +403,7 @@ describe('FHIR Routes', () => {
     }
     commLang.binding.strength = 'required';
 
-    const profileUrl = 'urn:uuid:' + randomUUID()
+    const profileUrl = 'urn:uuid:' + randomUUID();
     const profileRes = await request(app)
       .post(`/fhir/R4/StructureDefinition`)
       .set('Authorization', 'Bearer ' + validateTerminologyAccessToken)
