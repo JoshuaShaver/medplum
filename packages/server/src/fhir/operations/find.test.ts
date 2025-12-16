@@ -65,7 +65,7 @@ describe('Schedule/:id/$find', () => {
       resourceType: 'Location',
       meta: { project: project.project.id },
       extension: [{ url: 'http://hl7.org/fhir/StructureDefinition/timezone', valueCode: 'America/Phoenix' }],
-    })
+    });
   });
 
   afterAll(async () => {
@@ -74,7 +74,7 @@ describe('Schedule/:id/$find', () => {
 
   async function makeSchedule(
     availability: Record<string, AvailabilityOptions>,
-    opts?: { actor?: Schedule['actor'] },
+    opts?: { actor?: Schedule['actor'] }
   ): Promise<Schedule> {
     const extension = Object.entries(availability).map(([serviceType, options]) => {
       const { availability, ...durations } = options;
@@ -430,9 +430,12 @@ describe('Schedule/:id/$find', () => {
 
   test("gets timezone data from the schedule's actor", async () => {
     // `location` has timezone set to America/Phoenix, which is always at offset -07:00
-    const schedule = await makeSchedule({
-      [wildcard]: { availability: fourDayWorkWeek, duration: 20 }
-    }, { actor: [createReference(location)] });
+    const schedule = await makeSchedule(
+      {
+        [wildcard]: { availability: fourDayWorkWeek, duration: 20 },
+      },
+      { actor: [createReference(location)] }
+    );
     const response = await request
       .get(`/fhir/R4/Schedule/${schedule.id}/$find`)
       .set('Authorization', `Bearer ${project.accessToken}`)
